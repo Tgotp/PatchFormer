@@ -20,7 +20,7 @@ do
         --random_seed $random_seed \
         --is_training 1 \
         --data_path $data_path \
-        --model_id $model_id_name$pred_len \
+        --model_id $model_id_name'_'$pred_len \
         --model $model_name \
         --train_epochs 100 \
         --batch_size 128 \

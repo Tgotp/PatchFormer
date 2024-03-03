@@ -8,21 +8,28 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Time Series Forecasting')
     
     parser.add_argument('--random_seed',type=int,default=2024,help='random_seed')
+    # data loader
+    parser.add_argument('--data_path',type=str,required=True,default='./data/Graph_BladeIcing/Icing_128_20/',help='dataset path')
+    parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
     parser.add_argument('--is_training',type=int,required=True,default=1,help='status')
     parser.add_argument('--model_id',type=str,required=True,default='test',help='model id')
     parser.add_argument('--model',type=str,required=True,default='PathFormer',
                             help='model name,options = [PathFormer]')
     
-    parser.add_argument('--data_path',type=str,required=True,default='./data/Graph_BladeIcing/Icing_128_20/',help='dataset path')
+    # Formers 
+    parser.add_argument('--enc_in', type=int, default=7, help='encoder input size') # DLinear with --individual, use this hyperparameter as the number of channel
     parser.add_argument('--dropout',type=float,default=0.05,help='dropout')
+
+
+    # optimization
     parser.add_argument('--train_epochs',type=int,default=100,help='train epochs')
-    parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
-
-
+    parser.add_argument('--patience', type=int, default=100, help='early stopping patience')
     parser.add_argument('--loss',type=str,default='mse', help='loss function')
+    parser.add_argument('--pct_start', type=float, default=0.3, help='pct_start')
     parser.add_argument('--learning_rate',type=float,default=0.0001, help='optimizer learning rate')
     parser.add_argument('--batch_size',type=int,default=64,help='batch size of train input data')
 
+    # GPU
     parser.add_argument('--use_gpu',type=bool,default=True,help='use gpu')
     parser.add_argument('--use_multi_gpu',action='store_true',help='use multiple gpus',default=False)
     parser.add_argument('--gpu',type=int,default=0,help='gpu')
@@ -49,7 +56,9 @@ if __name__ == '__main__':
     if args.is_training:
 
         Exp = Exp_Main
-        setting = '{}_{}'.format
+        setting = '{}_{}'.format(
+                args.model_id,
+                args.model)
         exp = Exp(args)
         exp.train(setting)
     

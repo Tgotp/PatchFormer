@@ -1,9 +1,16 @@
 from exp.exp_basic import Exp_Basic
+from utils.tools import EarlyStopping
 from models import Pathformer
+
 import torch.nn as nn
 import numpy as np
+
+from torch.optim import lr_scheduler 
+from torch import optim
 import torch
-    
+import time
+import os    
+
 class Exp_Main(Exp_Basic):
     def __init__(self,args):
         super(Exp_Main,self).__init__(args)
@@ -25,6 +32,14 @@ class Exp_Main(Exp_Basic):
         
         return [data_x,data_y]
     
+    def _select_optimizer(self):
+        model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        return model_optim
+
+    def _select_criterion(self):
+        criterion = nn.MSELoss()
+        return criterion
+    
     def train(self, setting):
 
         train_loader = self._get_data(flag='train')
@@ -37,15 +52,13 @@ class Exp_Main(Exp_Basic):
 
         time_now = time.time()
 
-        train_steps = len(train_loader)
+        train_steps = len(train_loader[0])
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
+        print('train_steps:',train_steps)
         model_optim = self._select_optimizer()
         criterion = self._select_criterion()
-
-        if self.args.use_amp:
-            scaler = torch.cuda.amp.GradScaler()
-            
+        
         scheduler = lr_scheduler.OneCycleLR(optimizer = model_optim,
                                             steps_per_epoch = train_steps,
                                             pct_start = self.args.pct_start,
@@ -55,15 +68,20 @@ class Exp_Main(Exp_Basic):
         for epoch in range(self.args.train_epochs):
             iter_count = 0
             train_loss = []
+            
 
             self.model.train()
             epoch_time = time.time()
-            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
+            
+            for train in train_loader:
+                batch_x = torch.tensor(train[0])
+                batch_y = torch.tensor(train[1])
                 iter_count += 1
                 model_optim.zero_grad()
                 batch_x = batch_x.float().to(self.device)
 
                 batch_y = batch_y.float().to(self.device)
+                """
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
 
@@ -142,6 +160,8 @@ class Exp_Main(Exp_Basic):
 
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
+        """
 
         return self.model
+
     
