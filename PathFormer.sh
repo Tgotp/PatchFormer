@@ -23,6 +23,6 @@ do
         --model_id $model_id_name'_'$pred_len \
         --model $model_name \
         --train_epochs 100 \
-        --batch_size 128 \
+        --batch_size 1 \
         --dropout 0.3
 done

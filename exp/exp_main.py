@@ -1,9 +1,9 @@
 from exp.exp_basic import Exp_Basic
 from utils.tools import EarlyStopping
 from models import Pathformer
+from data_provider.data_factory import data_provider
 
 import torch.nn as nn
-import numpy as np
 
 from torch.optim import lr_scheduler 
 from torch import optim
@@ -27,10 +27,8 @@ class Exp_Main(Exp_Basic):
         return model
     
     def _get_data(self,flag):
-        data_x = np.load(self.args.data_path + 'X_' + flag + '.npy')
-        data_y = np.load(self.args.data_path + 'y_' + flag + '.npy')
-        
-        return [data_x,data_y]
+        data_loader = data_provider(self.args,flag)
+        return data_loader
     
     def _select_optimizer(self):
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
@@ -52,7 +50,7 @@ class Exp_Main(Exp_Basic):
 
         time_now = time.time()
 
-        train_steps = len(train_loader[0])
+        train_steps = len(train_loader)
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
         print('train_steps:',train_steps)
@@ -73,17 +71,10 @@ class Exp_Main(Exp_Basic):
             self.model.train()
             epoch_time = time.time()
             
-            for train in train_loader:
-                batch_x = torch.tensor(train[0])
-                batch_y = torch.tensor(train[1])
+            for batch_x,batch_y in train_loader:
                 iter_count += 1
                 model_optim.zero_grad()
-                batch_x = batch_x.float().to(self.device)
-
-                batch_y = batch_y.float().to(self.device)
                 """
-                batch_x_mark = batch_x_mark.float().to(self.device)
-                batch_y_mark = batch_y_mark.float().to(self.device)
 
                 # decoder input
                 dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
