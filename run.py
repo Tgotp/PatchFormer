@@ -27,6 +27,7 @@ if __name__ == '__main__':
     parser.add_argument('--loss',type=str,default='mse', help='loss function')
     parser.add_argument('--pct_start', type=float, default=0.3, help='pct_start')
     parser.add_argument('--learning_rate',type=float,default=0.0001, help='optimizer learning rate')
+    parser.add_argument('--lradj', type=str, default='type3', help='adjust learning rate')
     parser.add_argument('--batch_size',type=int,default=64,help='batch size of train input data')
 
     # GPU
