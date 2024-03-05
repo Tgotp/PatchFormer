@@ -1,10 +1,14 @@
 import numpy as np
 import torch
+import pywt
 import matplotlib.pyplot as plt
 import time
 
 plt.switch_backend('agg')
 
+def to_categorical(x,y):
+    x = x.int().squeeze()
+    return torch.eye(y)[x]
 
 def adjust_learning_rate(optimizer, scheduler, epoch, args, printout=True):
     # lr = args.learning_rate * (0.2 ** (epoch // 2))

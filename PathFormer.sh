@@ -23,6 +23,7 @@ do
         --model_id $model_id_name'_'$pred_len \
         --model $model_name \
         --train_epochs 100 \
-        --batch_size 1 \
-        --dropout 0.3
+        --batch_size 16 \
+        --dropout 0.3 \
+        --waveletLevel 3
 done
