@@ -161,7 +161,10 @@ class TSTiEncoder(nn.Module):  #i means channel-independent
         x = x.permute(0,1,3,2)                                                   # x: [bs x nvars x patch_num x patch_len]
         x = self.W_P(x)                                                          # x: [bs x nvars x patch_num x d_model]
 
+        # print('xxxx.shape',x.shape)
         u = torch.reshape(x, (x.shape[0]*x.shape[1],x.shape[2],x.shape[3]))      # u: [bs * nvars x patch_num x d_model]
+        
+        # print('xxxx.shape',x.shape)
         u = self.dropout(u + self.W_pos)                                         # u: [bs * nvars x patch_num x d_model]
 
         # Encoder

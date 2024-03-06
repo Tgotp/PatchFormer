@@ -8,7 +8,6 @@ import torch.nn as nn
 from torch.optim import lr_scheduler 
 from torch import optim
 import numpy as np
-import torchmetrics
 import torch
 import time
 import os    

@@ -56,9 +56,8 @@ class Model(nn.Module):
                                   pe=pe, learn_pe=learn_pe, fc_dropout=fc_dropout, head_dropout=head_dropout, padding_patch = padding_patch,
                                   pretrain_head=pretrain_head, head_type=head_type, individual=individual, revin=revin, affine=affine,
                                   subtract_last=subtract_last, verbose=verbose, **kwargs).to(device))
-        # self.linear = nn.Linear(length,2)
-        self.fs = nn.functional.softmax
 
+        self.fs = nn.functional.softmax
         self.linear = nn.Linear(240*26,2)
     
     def forward(self, x):
@@ -66,18 +65,22 @@ class Model(nn.Module):
         left = 0
         length = 0
         total_length = x.shape[1]
-        # waveletOutput = []
+        waveletOutput = []
         for i in range(len(self.signal_length)):
             length = self.signal_length[i]
             right = int(left + length)
             x_crop = x[:, left:right, :]
             left += length
 
-            print('x_crop',x_crop.shape)
+            x_crop = x_crop.permute((0, 2, 1))
+            # print('x_crop',x_crop.shape)
             y = self.hete_models[i](x_crop)
+            y = y.permute((0, 2, 1))
             waveletOutput.append(y)
-        print('xshape',x.shape)
+        
+        x = torch.cat(waveletOutput,axis = 1)
         x = torch.flatten(x,1,2)
+        # print('linearshape',x.shape)
         x = self.linear(x)
-        x = self.fs(x)
+        x = self.fs(x,dim=0)
         return x
