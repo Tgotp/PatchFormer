@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from exp.exp_basic import Exp_Basic
 from utils.tools import EarlyStopping,adjust_learning_rate
 from models import Pathformer
@@ -14,13 +15,6 @@ import os
 
 class Exp_Main(Exp_Basic):
     def __init__(self,args):
-        self.train_loader, self.signal_length_train = data_provider(args,flag='train')
-        # vali_loader , signal_length_vali  = data_provider(flag='test')
-        self.test_loader , self.signal_length_test  = data_provider(args,flag='test')
-
-
-        # self.signal_length_train = self.signal_length_train.float().to(self.device)
-        # self.signal_length_test = self.signal_length_test.float().to(self.device)
 
         super(Exp_Main,self).__init__(args)
 
@@ -30,7 +24,7 @@ class Exp_Main(Exp_Basic):
             'PathFormer': Pathformer ,
         }
 
-        model = model_dict[self.args.model].Model(self.args,self.signal_length_train,self.device).float()
+        model = model_dict[self.args.model].Model(self.args).float()
 
         if self.args.use_multi_gpu and self.args.use_gpu:
             model = nn.DataParallel(model,device_ids=self.args.device_ids)
@@ -72,6 +66,10 @@ class Exp_Main(Exp_Basic):
         return correct, total_loss
 
     def train(self, setting):
+        
+        train_loader = data_provider(self.args,flag='train')
+        # vali_loader , signal_length_vali  = data_provider(flag='test')
+        test_loader  = data_provider(self.args,flag='test')
 
         path = os.path.join(self.args.checkpoints, setting)
         if not os.path.exists(path):
@@ -79,7 +77,7 @@ class Exp_Main(Exp_Basic):
 
         time_now = time.time()
 
-        train_steps = len(self.train_loader)
+        train_steps = len(train_loader)
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
         model_optim = self._select_optimizer()
@@ -93,6 +91,7 @@ class Exp_Main(Exp_Basic):
 
 
         for epoch in range(self.args.train_epochs):
+            print(f"Epoch #{epoch+1}:")
             iter_count = 0
             train_loss = []
             
@@ -100,9 +99,9 @@ class Exp_Main(Exp_Basic):
             epoch_time = time.time()
             
             # test_acc = torchmetrics.Accuracy
-            size = len(self.train_loader.dataset)
+            size = len(train_loader.dataset)
             i,correct = 0,0
-            for batch_x,batch_y in self.train_loader:
+            for batch_x,batch_y in tqdm(train_loader):
                 iter_count += 1
                 i += 1
                 
@@ -141,7 +140,7 @@ class Exp_Main(Exp_Basic):
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
             # vali_acc, vali_loss = self.vali(vali_loader, criterion)
-            test_acc, test_loss = self.vali(self.test_loader, criterion)
+            test_acc, test_loss = self.vali(test_loader, criterion)
             vali_loss = test_loss
 
             correct /= size

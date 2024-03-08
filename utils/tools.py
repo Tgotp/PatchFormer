@@ -119,6 +119,32 @@ def test_params_flop(model,x_shape):
         print('{:<30}  {:<8}'.format('Computational complexity: ', macs))
         print('{:<30}  {:<8}'.format('Number of parameters: ', params))
 
+def Multi_Scale_Router(data,K): # [batch size, features, signal length]
+    
+    # 计算 DFT
+    dft_result = torch.fft.fftn(data, dim=[-1])  # 在信号长度维度上进行 DFT
+
+    # 计算每个频率分量的幅度
+    amplitudes = torch.abs(dft_result)
+
+    # 找到幅度最大的 K 个频率分量的索引
+    top_indices = torch.argsort(amplitudes, dim=-1, descending=True)[..., :K]
+    # print('fft indices',top_indices)
+    # print('fft dft_result.shape',dft_result.shape)
+
+    # 构造一个与原始信号相同形状的零张量，并将选定的频率分量放置在适当的位置
+    dft_modified = torch.zeros_like(dft_result)
+    dft_modified.scatter_(-1, top_indices, dft_result)
+
+    # 使用逆离散傅里叶变换（IDFT）将修改后的频率域信号转换回时域
+    idft_result = torch.fft.ifftn(dft_modified, dim=[-1]).real  # 在信号长度维度上进行 IDFT
+
+    # 从原始信号中减去季节性模式，得到剩余部分
+    residual = data - idft_result
+
+    # print("Residual:", residual)
+
+    return residual
 
 def wavelet_FCNN_preprocessing_set(X, waveletLevel=3, waveletFilter='haar'):
     '''

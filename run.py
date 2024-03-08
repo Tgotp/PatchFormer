@@ -17,13 +17,17 @@ if __name__ == '__main__':
     parser.add_argument('--model',type=str,required=True,default='PathFormer',
                             help='model name,options = [PathFormer]')
     # wavelet
-    parser.add_argument('--waveletLevel',type=int,default=4,help='wavelet Level')
-    parser.add_argument('--waveletFilter', type=str, default='haar', help='wavelet Filter')
+    # parser.add_argument('--waveletLevel',type=int,default=4,help='wavelet Level')
+    # parser.add_argument('--waveletFilter', type=str, default='haar', help='wavelet Filter')
+
+    # Multi-Scale Router
+    parser.add_argument('--path_size',type=int,default=16,help='patch size')
+    parser.add_argument('--K',type=int,default=5,help='patch size')
 
     # PatchTST
     parser.add_argument('--fc_dropout', type=float, default=0.05, help='fully connected dropout')
     parser.add_argument('--head_dropout', type=float, default=0.0, help='head dropout')
-    parser.add_argument('--patch_len', type=int, default=16, help='patch length')
+    parser.add_argument('--patch_len', type=int, default=8, help='patch length')
     parser.add_argument('--stride', type=int, default=8, help='stride')
     parser.add_argument('--padding_patch', default='None', help='None: None; end: padding on the end')
     parser.add_argument('--revin', type=int, default=1, help='RevIN; True 1 False 0')

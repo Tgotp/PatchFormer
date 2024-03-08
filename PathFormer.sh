@@ -25,5 +25,6 @@ do
         --train_epochs 100 \
         --batch_size 16 \
         --dropout 0.3 \
-        --waveletLevel 3
+        --K 5 \
+        --path_size 8 
 done
