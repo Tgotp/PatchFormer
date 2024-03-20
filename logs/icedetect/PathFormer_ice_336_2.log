@@ -1,0 +1,3 @@
+Args in experiment:
+Namespace(is_training=1, model='PathFormer', model_id='336_2', data='Icing_128_20/', data_path='./data/Graph_BladeIcing/', features='M', target='OT', freq='h', checkpoints='./checkpoints/', seq_len=336, pred_len=2, individual=False, d_model=8, d_ff=64, num_nodes=21, layer_nums=3, k=2, num_experts_list=[4, 4, 4], patch_size_list=[['1', '6'], ['1', '2'], ['8'], ['4'], ['1', '2'], ['8'], ['6'], ['4'], ['8'], ['6'], ['2'], ['1', '2']], do_predict=False, revin=1, drop=0.1, embed='timeF', residual_connection=1, metric='mae', num_workers=10, itr=1, train_epochs=30, batch_size=256, patience=10, learning_rate=0.001, lradj='TST', use_amp=False, pct_start=0.4, use_gpu=True, gpu=0, use_multi_gpu=False, devices='2', test_flop=False)
+USE GPU: cuda:0
