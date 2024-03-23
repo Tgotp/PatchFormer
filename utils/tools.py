@@ -3,8 +3,39 @@ import torch
 import pywt
 import matplotlib.pyplot as plt
 import time
+from sklearn.utils import check_random_state
 
 plt.switch_backend('agg')
+
+def custom_smote(X, y, sampling_strategy='auto', random_state=None):
+    random_state = check_random_state(random_state)
+
+    # 计算需要生成的样本数量
+    y = y.ravel()
+    class_counts = np.bincount(y)
+    if sampling_strategy == 'auto':
+        target_count = np.max(class_counts)
+    else:
+        target_count = sampling_strategy * np.sum(class_counts)
+
+    # 遍历少数类别样本，生成合成样本
+    new_samples = []
+    for class_label in np.unique(y):
+        if class_counts[class_label] < target_count:
+            # 找到该类别的样本
+            class_samples = X[y == class_label]
+            num_samples_to_generate = int(target_count) - class_counts[class_label]
+
+            # 随机生成样本
+            for i in range(num_samples_to_generate):
+                # 随机选择一个样本
+                random_sample = class_samples[random_state.randint(0, class_counts[class_label])]
+                new_samples.append(random_sample)
+                y = np.append(y, class_label)
+
+    # 合并原样本和新生成的样本
+    X_resampled = np.vstack((X, np.array(new_samples)))
+    return X_resampled, y
 
 def to_categorical(x,y):
     x = x.int().squeeze()

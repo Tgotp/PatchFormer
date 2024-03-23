@@ -67,7 +67,7 @@ class Exp_Main(Exp_Basic):
 
     def train(self, setting):
         
-        train_loader = data_provider(self.args,flag='train')
+        train_loader = data_provider(self.args,flag='train',resample = True)
         # vali_loader , signal_length_vali  = data_provider(flag='test')
         test_loader  = data_provider(self.args,flag='test')
 
@@ -107,8 +107,6 @@ class Exp_Main(Exp_Basic):
                 
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
-
-                # print('batch_x:\n',batch_x)
 
                 model_optim.zero_grad()
                 

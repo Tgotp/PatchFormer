@@ -20,6 +20,7 @@ class AMS(nn.Module):
 
         self.experts = nn.ModuleList()
         self.MLPs = nn.ModuleList()
+        
         for patch in patch_size:
             patch_nums = int(input_size / patch)
             self.experts.append(Transformer_Layer(device=device, d_model=d_model, d_ff=d_ff,
@@ -100,6 +101,7 @@ class AMS(nn.Module):
     def forward(self, x, loss_coef=1e-2):
         new_x = self.seasonality_and_trend_decompose(x)
 
+
         #multi-scale router
         gates, load = self.noisy_top_k_gating(new_x, self.training)
         # calculate balance loss
@@ -108,6 +110,7 @@ class AMS(nn.Module):
         balance_loss *= loss_coef
         dispatcher = SparseDispatcher(self.num_experts, gates)
         expert_inputs = dispatcher.dispatch(x)
+
         expert_outputs = [self.experts[i](expert_inputs[i])[0] for i in range(self.num_experts)]
         output = dispatcher.combine(expert_outputs)
         if self.residual_connection:

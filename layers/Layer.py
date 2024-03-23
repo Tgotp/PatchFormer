@@ -71,7 +71,6 @@ class Transformer_Layer(nn.Module):
 
         weights_shared, biases_shared = self.weights_generator_shared()
         weights_distinct, biases_distinct = self.weights_generator_distinct()
-
         ####intra Attention#####
         for i in range(self.patch_nums):
             t = x[:, i * self.patch_size:(i + 1) * self.patch_size, :, :]
@@ -108,6 +107,8 @@ class Transformer_Layer(nn.Module):
         inter_out = torch.reshape(inter_out, (b, nvar, inter_out.shape[-2], inter_out.shape[-1]))
         inter_out = torch.reshape(inter_out, (b, nvar, inter_out.shape[-2], self.patch_size, self.d_model))
         inter_out = torch.reshape(inter_out, (b, self.patch_size*self.patch_nums, nvar, self.d_model)) #[b, temporal, nvar, dim]
+
+        # print('new_x',new_x.shape,'intra_out_concat',intra_out_concat.shape,'inter_out',inter_out.shape)
 
         out = new_x + intra_out_concat + inter_out
         ##FFN

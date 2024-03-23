@@ -38,11 +38,11 @@ if __name__ == '__main__':
     # model
     parser.add_argument('--d_model', type=int, default=16)
     parser.add_argument('--d_ff', type=int, default=64)
-    parser.add_argument('--num_nodes', type=int, default=21)
+    parser.add_argument('--num_nodes', type=int, default=128)
     parser.add_argument('--layer_nums', type=int, default=3)
     parser.add_argument('--k', type=int, default=2, help='choose the Top K patch size at the every layer ')
     parser.add_argument('--num_experts_list', type=list, default=[4, 4, 4])
-    parser.add_argument('--patch_size_list', nargs='+', type=list, default=[16,12,8,32,12,8,6,4,8,6,4,2])
+    parser.add_argument('--patch_size_list', nargs='+', type=int, default=[16,12,8,32,12,8,6,4,8,6,4,2])
     parser.add_argument('--do_predict', action='store_true', help='whether to predict unseen future data')
     parser.add_argument('--revin', type=int, default=1, help='whether to apply RevIN')
     parser.add_argument('--drop', type=float, default=0.1, help='dropout ratio')
